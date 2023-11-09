@@ -4,16 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.shoppinglist.domain.ProductItem
 import com.example.shoppinglist.domain.ProductListRepository
+import kotlin.random.Random
 
 object ProductListRepositoryImpl : ProductListRepository {
 
 	private val productListLiveData = MutableLiveData<List<ProductItem>>()
-	private val productList = mutableListOf<ProductItem>()
+	private val productList = sortedSetOf<ProductItem>({ o1, o2 -> o1.id.compareTo(o2.id) })
 	private var autoIncrementId = 0
 
 	init {
-		for (i in 0 until 10) {
-			val item = ProductItem("Name $i", i.toDouble(), true)
+		for (i in 0 until 20) {
+			val item = ProductItem("Name $i", i.toDouble(), Random.nextBoolean())
 			addProductItem(item)
 		}
 	}
