@@ -1,18 +1,13 @@
 package com.example.shoppinglist.presentation
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ProductItem
 
-class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
-
-	interface OnProductItemLongClickListener {
-		fun onProductItemLongClick(productItem: ProductItem)
-	}
+class ShopListAdapter :
+	ListAdapter<ProductItem, ShopItemViewHolder>(ProductItemDiffCallback()) {
 
 	companion object {
 		const val VIEW_TYPE_ENABLE = 0
@@ -20,18 +15,9 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 		const val MAX_POOL_SIZE = 15
 	}
 
-	var productsList = listOf<ProductItem>()
-		set(value) {
-			field = value
-			notifyDataSetChanged()
-		}
+	var onProductItemLongClickListener: ((ProductItem) -> Unit)? = null
+	var onProductClickListener: ((ProductItem) -> Unit)? = null
 
-	var onProductItemLongClickListener: OnProductItemLongClickListener? = null
-
-	class ShopItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-		val tvProductType = view.findViewById<TextView>(R.id.tvProductType)!!
-		val tvProductCount = view.findViewById<TextView>(R.id.tvProductCount)!!
-	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
 		val layout = when (viewType) {
@@ -48,22 +34,21 @@ class ShopListAdapter : RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>
 		return ShopItemViewHolder(view)
 	}
 
-	override fun getItemCount(): Int {
-		return productsList.size
-	}
-
 	override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
-		val productItem = productsList[position]
+		val productItem = getItem(position)
 		holder.tvProductType.text = productItem.name
 		holder.tvProductCount.text = productItem.count.toString()
 		holder.itemView.setOnLongClickListener {
-			onProductItemLongClickListener?.onProductItemLongClick(productItem)
+			onProductItemLongClickListener?.invoke(productItem)
 			true
+		}
+		holder.itemView.setOnClickListener {
+			onProductClickListener?.invoke(productItem)
 		}
 	}
 
 	override fun getItemViewType(position: Int): Int {
-		val item = productsList[position]
+		val item = getItem(position)
 		return if (item.enable) {
 			VIEW_TYPE_ENABLE
 		} else {
