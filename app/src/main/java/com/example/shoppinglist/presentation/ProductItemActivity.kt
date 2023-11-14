@@ -2,26 +2,20 @@ package com.example.shoppinglist.presentation
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ProductItem
-import com.google.android.material.textfield.TextInputLayout
 
 class ProductItemActivity : AppCompatActivity() {
 
-	private lateinit var viewModel: ProductItemViewModel
+//	private lateinit var viewModel: ProductItemViewModel
 
-	private lateinit var tilName: TextInputLayout;
-	private lateinit var etName: EditText;
-	private lateinit var tilCount: TextInputLayout;
-	private lateinit var etCount: EditText;
-	private lateinit var btnSave: Button;
+//	private lateinit var tilName: TextInputLayout;
+//	private lateinit var etName: EditText;
+//	private lateinit var tilCount: TextInputLayout;
+//	private lateinit var etCount: EditText;
+//	private lateinit var btnSave: Button;
 
 	private var screenMode = MODE_UNKNOWN
 	private var productItemId = ProductItem.UNDEFINED_ID
@@ -51,21 +45,21 @@ class ProductItemActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_product_item)
 		parseIntent()
-		viewModel = ViewModelProvider(this)[ProductItemViewModel::class.java]
-		initViews()
-		initTextChangeListeners()
+//		viewModel = ViewModelProvider(this)[ProductItemViewModel::class.java]
+//		initViews()
+//		initTextChangeListeners()
 		launchScreenMode()
-		observeViewModel()
+//		observeViewModel()
 	}
 
 
-	private fun initViews() {
-		tilName = findViewById(R.id.tilName)
-		tilCount = findViewById(R.id.tilCount)
-		etName = findViewById(R.id.etName)
-		etCount = findViewById(R.id.etCount)
-		btnSave = findViewById(R.id.btnSave)
-	}
+//	private fun initViews() {
+//		tilName = findViewById(R.id.tilName)
+//		tilCount = findViewById(R.id.tilCount)
+//		etName = findViewById(R.id.etName)
+//		etCount = findViewById(R.id.etCount)
+//		btnSave = findViewById(R.id.btnSave)
+//	}
 
 	private fun parseIntent() {
 		if (!intent.hasExtra(EXTRA_SCREEN_MODE)) {
@@ -84,76 +78,80 @@ class ProductItemActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun launchEditMode() {
-		viewModel.getProductItem(productItemId)
-		viewModel.productItem.observe(this) {
-			etName.setText(it.name)
-			etCount.setText(it.count.toString())
-		}
-		btnSave.setOnClickListener {
-			viewModel.editProductItem(etName.text?.toString(), etCount.text?.toString())
-		}
+//	private fun launchEditMode() {
+//		viewModel.getProductItem(productItemId)
+//		viewModel.productItem.observe(this) {
+//			etName.setText(it.name)
+//			etCount.setText(it.count.toString())
+//		}
+//		btnSave.setOnClickListener {
+//			viewModel.editProductItem(etName.text?.toString(), etCount.text?.toString())
+//		}
+//
+//	}
 
-	}
+//	private fun launchAddMode() {
+//		btnSave.setOnClickListener {
+//			viewModel.addProductItem(etName.text?.toString(), etCount.text?.toString())
+//		}
+//	}
 
-	private fun launchAddMode() {
-		btnSave.setOnClickListener {
-			viewModel.addProductItem(etName.text?.toString(), etCount.text?.toString())
-		}
-	}
-
-	private fun initTextChangeListeners() {
-		etName.addTextChangedListener(object : TextWatcher {
-			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-			}
-
-			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-				viewModel.resetErrorInputName()
-			}
-
-			override fun afterTextChanged(s: Editable?) {
-			}
-		})
-		etCount.addTextChangedListener(object : TextWatcher {
-			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-			}
-
-			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-				viewModel.resetErrorInputCount()
-			}
-
-			override fun afterTextChanged(s: Editable?) {
-			}
-		})
-	}
+//	private fun initTextChangeListeners() {
+//		etName.addTextChangedListener(object : TextWatcher {
+//			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//			}
+//
+//			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//				viewModel.resetErrorInputName()
+//			}
+//
+//			override fun afterTextChanged(s: Editable?) {
+//			}
+//		})
+//		etCount.addTextChangedListener(object : TextWatcher {
+//			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//			}
+//
+//			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//				viewModel.resetErrorInputCount()
+//			}
+//
+//			override fun afterTextChanged(s: Editable?) {
+//			}
+//		})
+//	}
 
 	private fun launchScreenMode() {
-		when (screenMode) {
-			MODE_EDIT -> launchEditMode()
-			MODE_ADD -> launchAddMode()
+		val fragment = when (screenMode) {
+			MODE_EDIT -> ProductItemFragment.newInstanceEditItem(productItemId)
+			MODE_ADD -> ProductItemFragment.newInstanceAddItem()
+			else -> throw RuntimeException("Unknown screen mode $screenMode")
 		}
+		supportFragmentManager.beginTransaction()
+			.add(R.id.product_item_container, fragment)
+			.commit()
 	}
 
-	private fun observeViewModel() {
-		viewModel.isErrorInputCount.observe(this) {
-			val message = if (it) {
-				getString(R.string.error_input_count)
-			} else {
-				null
-			}
-			tilCount.error = message
-		}
-
-		viewModel.isErrorInputName.observe(this) {
-			val message = if (it) {
-				getString(R.string.error_input_name)
-			} else {
-				null
-			}
-			tilName.error = message
-		}
-		viewModel.isReadyToCloseScreen.observe(this) {
-			finish()
-		}
-	}
+//	private fun observeViewModel() {
+//		viewModel.isErrorInputCount.observe(this) {
+//			val message = if (it) {
+//				getString(R.string.error_input_count)
+//			} else {
+//				null
+//			}
+//			tilCount.error = message
+//		}
+//
+//		viewModel.isErrorInputName.observe(this) {
+//			val message = if (it) {
+//				getString(R.string.error_input_name)
+//			} else {
+//				null
+//			}
+//			tilName.error = message
+//		}
+//		viewModel.isReadyToCloseScreen.observe(this) {
+//			finish()
+//		}
+//	}
 }
