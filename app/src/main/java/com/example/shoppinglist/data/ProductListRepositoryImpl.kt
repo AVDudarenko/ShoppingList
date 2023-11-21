@@ -1,53 +1,40 @@
 package com.example.shoppinglist.data
 
+import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
 import com.example.shoppinglist.domain.ProductItem
 import com.example.shoppinglist.domain.ProductListRepository
-import kotlin.random.Random
 
-object ProductListRepositoryImpl : ProductListRepository {
+class ProductListRepositoryImpl(
+	application: Application
+) : ProductListRepository {
 
-	private val productListLiveData = MutableLiveData<List<ProductItem>>()
-	private val productList = sortedSetOf<ProductItem>({ o1, o2 -> o1.id.compareTo(o2.id) })
-	private var autoIncrementId = 0
-
-	init {
-		for (i in 0 until 20) {
-			val item = ProductItem("Name $i", i.toDouble(), Random.nextBoolean())
-			addProductItem(item)
-		}
-	}
-
+	private val productListDao = AppDatabase.getInstance(application).productListDao()
+	private val mapper = ProductListMapper()
 	override fun addProductItem(productItem: ProductItem) {
-		if (productItem.id == ProductItem.UNDEFINED_ID) {
-			productItem.id = autoIncrementId++
-		}
-		productList.add(productItem)
-		updateList()
+		productListDao.addProductItem(mapper.mapEntityToDbModel(productItem))
 	}
 
 	override fun deleteProductItem(productItem: ProductItem) {
-		productList.remove(productItem)
-		updateList()
+		productListDao.deleteProductItem(productItem.id)
 	}
 
 	override fun editProduct(productItem: ProductItem) {
-		val oldProductItem = getProductItem(productItem.id)
-		productList.remove(oldProductItem)
-		addProductItem(productItem)
+		productListDao.addProductItem(mapper.mapEntityToDbModel(productItem))
 	}
 
 	override fun getProductItem(productItemId: Int): ProductItem {
-		return productList.find { it.id == productItemId }
-			?: throw RuntimeException("Element with id $productItemId not found")
+		val dbModel = productListDao.getProductItem(productItemId)
+		return mapper.mapDbModelToEntity(dbModel)
 	}
 
-	override fun getProductList(): LiveData<List<ProductItem>> {
-		return productListLiveData
-	}
 
-	private fun updateList() {
-		productListLiveData.postValue(productList.toList())
-	}
+	//MediatorLiveData get some event from another LD, and react to them.
+	override fun getProductList(): LiveData<List<ProductItem>> =
+		MediatorLiveData<List<ProductItem>>().apply {
+			addSource(productListDao.getProductList()) {
+				value = mapper.mapListDbModelToListEntity(it)
+			}
+		}
 }

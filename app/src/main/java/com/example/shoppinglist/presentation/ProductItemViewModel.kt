@@ -1,5 +1,7 @@
 package com.example.shoppinglist.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,9 +11,9 @@ import com.example.shoppinglist.domain.EditProductItemUseCase
 import com.example.shoppinglist.domain.GetProductItemUseCase
 import com.example.shoppinglist.domain.ProductItem
 
-class ProductItemViewModel : ViewModel() {
+class ProductItemViewModel(application: Application) : AndroidViewModel(application) {
 
-	private val repository = ProductListRepositoryImpl
+	private val repository = ProductListRepositoryImpl(application)
 
 	private val getProductItemUseCase = GetProductItemUseCase(repository)
 	private val addProductItemUseCase = AddProductItemUseCase(repository)

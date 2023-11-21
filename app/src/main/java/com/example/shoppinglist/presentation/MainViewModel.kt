@@ -1,15 +1,16 @@
 package com.example.shoppinglist.presentation
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.example.shoppinglist.data.ProductListRepositoryImpl
 import com.example.shoppinglist.domain.DeleteProductItemUseCase
 import com.example.shoppinglist.domain.EditProductItemUseCase
 import com.example.shoppinglist.domain.GetProductListUseCase
 import com.example.shoppinglist.domain.ProductItem
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-	private val repository = ProductListRepositoryImpl
+	private val repository = ProductListRepositoryImpl(application)
 
 	private val getProductListUseCase = GetProductListUseCase(repository)
 	private val deleteProductItemUseCase = DeleteProductItemUseCase(repository)
