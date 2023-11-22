@@ -1,17 +1,20 @@
 package com.example.shoppinglist.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.data.ProductListRepositoryImpl
 import com.example.shoppinglist.domain.AddProductItemUseCase
 import com.example.shoppinglist.domain.EditProductItemUseCase
 import com.example.shoppinglist.domain.GetProductItemUseCase
 import com.example.shoppinglist.domain.ProductItem
+import kotlinx.coroutines.launch
 
-class ProductItemViewModel : ViewModel() {
+class ProductItemViewModel(application: Application) : AndroidViewModel(application) {
 
-	private val repository = ProductListRepositoryImpl
+	private val repository = ProductListRepositoryImpl(application)
 
 	private val getProductItemUseCase = GetProductItemUseCase(repository)
 	private val addProductItemUseCase = AddProductItemUseCase(repository)
@@ -34,8 +37,10 @@ class ProductItemViewModel : ViewModel() {
 		get() = _isReadyToCloseScreen
 
 	fun getProductItem(productItemId: Int) {
-		val item = getProductItemUseCase.getProductItem(productItemId)
-		_productItem.value = item
+		viewModelScope.launch {
+			val item = getProductItemUseCase.getProductItem(productItemId)
+			_productItem.value = item
+		}
 	}
 
 	fun addProductItem(inputName: String?, inputCount: String?) {
@@ -43,9 +48,11 @@ class ProductItemViewModel : ViewModel() {
 		val count = parseCount(inputCount)
 		val fieldsValid = validateInput(name, count)
 		if (fieldsValid) {
-			val productItem = ProductItem(name, count, true)
-			addProductItemUseCase.addProductItem(productItem)
-			closeScreen()
+			viewModelScope.launch {
+				val productItem = ProductItem(name, count, true)
+				addProductItemUseCase.addProductItem(productItem)
+				closeScreen()
+			}
 		}
 	}
 
@@ -55,9 +62,11 @@ class ProductItemViewModel : ViewModel() {
 		val fieldsValid = validateInput(name, count)
 		if (fieldsValid) {
 			_productItem.value?.let {
-				val item = it.copy(name = name, count = count)
-				editProductItemUseCase.editProduct(item)
-				closeScreen()
+				viewModelScope.launch {
+					val item = it.copy(name = name, count = count)
+					editProductItemUseCase.editProduct(item)
+					closeScreen()
+				}
 			}
 		}
 	}
@@ -98,5 +107,4 @@ class ProductItemViewModel : ViewModel() {
 	private fun closeScreen() {
 		_isReadyToCloseScreen.value = Unit
 	}
-
 }
