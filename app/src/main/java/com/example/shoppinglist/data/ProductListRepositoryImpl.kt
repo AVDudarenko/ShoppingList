@@ -12,19 +12,19 @@ class ProductListRepositoryImpl(
 
 	private val productListDao = AppDatabase.getInstance(application).productListDao()
 	private val mapper = ProductListMapper()
-	override fun addProductItem(productItem: ProductItem) {
+	override suspend fun addProductItem(productItem: ProductItem) {
 		productListDao.addProductItem(mapper.mapEntityToDbModel(productItem))
 	}
 
-	override fun deleteProductItem(productItem: ProductItem) {
+	override suspend fun deleteProductItem(productItem: ProductItem) {
 		productListDao.deleteProductItem(productItem.id)
 	}
 
-	override fun editProduct(productItem: ProductItem) {
+	override suspend fun editProduct(productItem: ProductItem) {
 		productListDao.addProductItem(mapper.mapEntityToDbModel(productItem))
 	}
 
-	override fun getProductItem(productItemId: Int): ProductItem {
+	override suspend fun getProductItem(productItemId: Int): ProductItem {
 		val dbModel = productListDao.getProductItem(productItemId)
 		return mapper.mapDbModelToEntity(dbModel)
 	}

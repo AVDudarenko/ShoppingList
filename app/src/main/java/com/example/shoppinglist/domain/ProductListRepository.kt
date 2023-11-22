@@ -4,19 +4,19 @@ import androidx.lifecycle.LiveData
 
 interface ProductListRepository {
 
-	fun addProductItem(productItem: ProductItem) {
+	suspend fun addProductItem(productItem: ProductItem) {
 
 	}
 
-	fun deleteProductItem(productItem: ProductItem) {
+	suspend fun deleteProductItem(productItem: ProductItem) {
 
 	}
 
-	fun editProduct(productItem: ProductItem) {
+	suspend fun editProduct(productItem: ProductItem) {
 
 	}
 
-	fun getProductItem(productItemId: Int): ProductItem {
+	suspend fun getProductItem(productItemId: Int): ProductItem {
 		TODO()
 	}
 
