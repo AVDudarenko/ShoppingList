@@ -8,18 +8,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
+import com.example.shoppinglist.databinding.ActivityMainBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity(), ProductItemFragment.OnEditingFinishListener {
 
 	private lateinit var viewModel: MainViewModel
 	private lateinit var shopListAdapter: ShopListAdapter
+	private val binding by lazy {
+		ActivityMainBinding.inflate(layoutInflater)
+	}
 	private var productItemContainer: FragmentContainerView? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_main)
-		productItemContainer = findViewById(R.id.productItemContainer)
+		setContentView(binding.root)
+		productItemContainer = binding.productItemContainer
 		setupRecyclerView()
 		viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 		viewModel.productList.observe(this) {
