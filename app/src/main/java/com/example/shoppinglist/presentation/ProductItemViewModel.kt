@@ -1,24 +1,21 @@
 package com.example.shoppinglist.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shoppinglist.data.ProductListRepositoryImpl
 import com.example.shoppinglist.domain.AddProductItemUseCase
 import com.example.shoppinglist.domain.EditProductItemUseCase
 import com.example.shoppinglist.domain.GetProductItemUseCase
 import com.example.shoppinglist.domain.ProductItem
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProductItemViewModel(application: Application) : AndroidViewModel(application) {
-
-	private val repository = ProductListRepositoryImpl(application)
-
-	private val getProductItemUseCase = GetProductItemUseCase(repository)
-	private val addProductItemUseCase = AddProductItemUseCase(repository)
-	private val editProductItemUseCase = EditProductItemUseCase(repository)
+class ProductItemViewModel @Inject constructor(
+	private val getProductItemUseCase: GetProductItemUseCase,
+	private val addProductItemUseCase: AddProductItemUseCase,
+	private val editProductItemUseCase: EditProductItemUseCase
+) : ViewModel() {
 
 	private val _isErrorInputName = MutableLiveData<Boolean>()
 	val isErrorInputName: LiveData<Boolean>
